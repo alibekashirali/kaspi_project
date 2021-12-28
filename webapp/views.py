@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 
 
 from django.http import HttpResponse, HttpRequest
+from django.template.loader import get_template
 import os
 
 from django.shortcuts import render
@@ -12,8 +13,6 @@ from django.shortcuts import render
 from account.account import Account
 from customer.customer import Customer
 from database.database import ObjectNotFound
-# from database.implementations.postgres_db import AccountDatabasePostgres
-# from database.implementations.ram import AccountDatabaseRAM
 from database.implementation.pandas_db import AccountDatabasePandas, TransactionDatabasePandas
 from test_all import PandasDBActivate
 
@@ -23,53 +22,37 @@ if dbname == "":
     print("Using Pandas")
 else:
     print("Error with connection to db")
-    # port:int = 25060
-    # user:str = os.environ.get("pg_user")
-    # password:str = os.environ.get("pg_password")
-    # host:str = "db-postgresql-nyc3-99638-do-user-4060406-0.b.db.ondigitalocean.com"
-    # connection_str = f"dbname={dbname} port={port} user={user} password={password} host={host}"
-    # database = AccountDatabasePostgres(connection=connection_str)
+
 
 
 def accounts_list(request: HttpRequest) -> HttpResponse:
+    # dbs = TransactionDatabasePandas()
+    # transac = dbs.get_objects()
+    
     accounts = database.get_objects()
-    currency = ["KZT", "USD", "EUR"]
     # for account in accounts:
     #     currency.append(account.currency)
     # currency = list(dict.fromkeys(currency))
     if len(accounts) == 0:
         PandasDBActivate.dbs()
 
-    return render(request, "accounts.html", context={"accounts": accounts, "currency": currency})
+    return render(request, "accounts.html", context={"accounts": accounts})
 
 def transactions_list(request: HttpRequest, id) -> HttpResponse:
     # print(id)
+    account = database.get_object(id)
     databs = TransactionDatabasePandas()
     transactions = databs.get_objects()
     # if len(transactions) == 0:
     #     PandasDBActivate.dbs()
 
-    return render(request, "account.html", context={"transactions": transactions})
+    return render(request, "account.html", context={"transactions": transactions, "account": account})
 
 
 
 # def customer_list(request: HttpRequest) -> HttpResponse:
 #     customer = database.get_objects()
 #     data = CreateCustomer().test_customer_create_with_accounts()
-
-#     customer1 = Customer(
-#         id_=uuid4(),
-#         age=21,
-#         first_name="Alibek",
-#         last_name="Ashirali",
-#     )
-    
-#     customer2 = Customer(
-#         id_=uuid4(),
-#         age=24,
-#         first_name="Mark",
-#         last_name="Zucha",
-#     )
 
 #     return render(request, "index.html", context={"customers": [customer1, customer2]})
 
@@ -117,12 +100,16 @@ def accounts(request: HttpRequest) -> HttpResponse:
         except Exception as e:
             return HttpResponse(content=f"Error: {e}", status=400)
 
-def create_account(request, currenc):
-    print(currenc)
-    PandasDBActivate.dbs()
+def create_account(request):
+    # PandasDBActivate.dbs()
+    # database.clear_all()
+    currency = request.GET['currencySelect']
+    account = Account.new_account(uuid4(), currency, Decimal(0))
+    database.save(account)
     return redirect('accounts_url')
 
-def create_transaction(request):
-    print(currenc)
-    return redirect('accounts_url')
-    render(request, "account.html", context={"transactions": transactions})
+def create_transaction(request: HttpRequest) -> HttpResponse:
+    accounts = database.get_objects()
+    # PandasDBActivate.transac()
+    return render(request, "transaction.html", context={"accounts": accounts})
+

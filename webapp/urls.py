@@ -16,14 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from webapp import views
+from uuid import uuid4
 
 urlpatterns = [
     path('', views.index),
     path('accounts/', views.accounts_list, name='accounts_url'),
     # path('customers/', views.customer_list),
-    path('account/create/<str:currenc>', views.create_account, name='account_create_url'),
-    path('account/<str:id>/', views.transactions_list, name='account_transactions_url'),
-    path('account/<str:id>/create_transaction/', views.transactions_list, name='create_transaction_url'),
+    path('account/create/', views.create_account, name='account_create_url'),
+    path('account/<uuid:id>/', views.transactions_list, name='account_transactions_url'),
+    path('account/create_transaction/', views.create_transaction, name='create_transaction_url'),
 
     # path('accounts/', views.accounts_list),
     # path('transactions/', views.accounts_list),

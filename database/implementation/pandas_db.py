@@ -57,7 +57,7 @@ class AccountDatabasePandas(AccountDatabase):
                 id_=filtered["id"],
                 currency=filtered["currency"],
                 balance=filtered["balance"],
-                transactions=row["transactions"],
+                transactions=filtered["transactions"],
             )
             return account
         print("--------this object is not found:", id_)
@@ -103,12 +103,9 @@ class TransactionDatabasePandas(TransactionDatabase):
             "amount": [transaction.amount], 
             "currency": [transaction.currency], 
             "status": [transaction.status],
-            "currency": [account.currency],
-            "balance": [account.balance],
-            "transactions": [account.transactions]
         })
         self._objects = self._objects.append(new_row)
-        self._objects.to_pickle("database.pk")
+        self._objects.to_pickle("transactions.pk")
 
     def get_objects(self) -> List[Transaction]:
         result = []

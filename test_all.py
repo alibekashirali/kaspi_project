@@ -3,8 +3,9 @@ from uuid import uuid4
 
 from account.account import Account
 from customer.customer import Customer
-from database.implementation.pandas_db import AccountDatabasePandas
-from database.database import AccountDatabase
+from transaction.transaction import Transaction
+from database.implementation.pandas_db import AccountDatabasePandas, TransactionDatabasePandas
+from database.database import AccountDatabase, TransactionDatabase
 
 class CreateCustomer:
     def test_customer_create(self) -> None:
@@ -83,5 +84,21 @@ class PandasDBActivate:
     def transac() -> None:
         implementation = AccountDatabasePandas
         database = implementation()
+        accounts = database.get_objects()
+        # print(accounts[0].id_, accounts[1].id_)
+
+        transaction = Transaction(
+            id_=uuid4(), 
+            from_account = accounts[0].id_, 
+            to_account = accounts[1].id_, 
+            amount = Decimal(200), 
+            currency = "KZT", 
+            status = "OK"
+        )
+
+        dbs = TransactionDatabasePandas()
+        dbs.save(transaction)
+        print(dbs.get_objects())
+
 
 

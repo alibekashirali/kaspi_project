@@ -78,3 +78,11 @@ class Account:
             balance=Decimal(0),
             transactions=[],
         )
+    
+    def new_account(id, currency, balance):
+        return Account(
+            id_=id, 
+            currency=currency, 
+            balance=balance, 
+            transactions=[],
+        )
